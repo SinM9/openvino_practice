@@ -61,7 +61,7 @@ void Detector::detect(const cv::Mat& image,
     nms(boxes, probabilities, nmsThreshold, indices);
     size = boxes.size();
 
-    int j, k = 0;
+    int k, j= 0;
     int dist;
     for (int i = 0; i < size; ++i) {
         if (indices[k] != i) {
