@@ -96,7 +96,6 @@ void nms(const std::vector<cv::Rect>& boxes, const std::vector<float>& probabili
             }
         }
     } 
-
     std::sort(spec.begin(), spec.end(), [](const std::pair<int,float>& F, const std::pair<int,float>& S){
             if(S.second < F.second)
                 return true;
