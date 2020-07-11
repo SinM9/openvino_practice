@@ -64,14 +64,14 @@ void Detector::detect(const cv::Mat& image,
     int k, j= 0;
     int dist;
     for (int i = 0; i < size; ++i) {
-        if (indices[k] != i) {
+        if (indices[k] == i) {
+            k++;
+        } else {
             dist = i - j;
             boxes.erase(boxes.begin() + dist);
             probabilities.erase(probabilities.begin() + dist);
             classes.erase(classes.begin() + dist);
             j++;
-        } else {
-            k++;
         }
     }
  }
@@ -79,29 +79,33 @@ void Detector::detect(const cv::Mat& image,
 void nms(const std::vector<cv::Rect>& boxes, const std::vector<float>& probabilities,
          float threshold, std::vector<unsigned>& indices){
 
-    size_t n = boxes.size();
-    std::set<size_t> remainingIndices;
-    for (size_t i = 0; i < n; i++) {
-        remainingIndices.insert(i);
+    std::vector <std::pair<int,float> > spec;
+    for (int i = 0; i < boxes.size(); ++i) {
+        spec.push_back(std::make_pair(i,probabilities[i]));
     }
-    while (!remainingIndices.empty()) {
-        size_t indMaxProb = 0;
-        float maxProb = 0.0f;
-        for (auto i : remainingIndices) {
-            if (probabilities[i] > maxProb) {
-                maxProb = probabilities[i];
-                indMaxProb = i;
+
+    for (int i = 0; i < boxes.size(); ++i) {
+        for (int j = i + 1; j < boxes.size(); ++j) {
+            if (iou(boxes[i], boxes[j]) > threshold) {
+                if (spec[i].second > spec[j].second) {
+                    spec[j].first = -1;
+                } else {
+                    spec[i].first = -1;
+                    break;
+                }
             }
         }
+        std::sort(spec.begin(), spec.end(), [](const std::pair<int,float>& F, const std::pair<int,float>& S){
+            if(S.second < F.second)
+                return true;
+            return false; 
+            });
 
-        remainingIndices.erase(indMaxProb);
-        indices.push_back(indMaxProb);
+    } 
 
-        for (auto i : remainingIndices) {
-            if (iou(boxes[indMaxProb], boxes[i]) > threshold) {
-                remainingIndices.erase(i);
-            }
-        }
+    for (int i = 0; i < boxes.size(); ++i){
+        if(spec[i].first != -1)
+            indices.push_back(spec[i].first);
     }
 }	
 
