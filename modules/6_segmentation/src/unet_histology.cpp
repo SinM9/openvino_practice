@@ -83,7 +83,7 @@ void UNetHistology::segment(const Mat& image, Mat& mask) {
     int* output = req.GetBlob(outputName)->buffer();
     for (int i = 0; i < row; ++i) {
         for (int j = 0; j < col; ++j) {
-            mask.at<uint8_t>(i, j) = output[i * cols + j];
+            mask.at<uint8_t>(i, j) = output[i * col + j];
         }
     }
     resize(mask, mask, image.size());;
