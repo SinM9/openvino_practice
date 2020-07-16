@@ -90,12 +90,12 @@ void UNetHistology::segment(const Mat& image, Mat& mask) {
 }
 
 int UNetHistology::countGlands(const cv::Mat& segm) {
-    morphologyEx(segm, segm, MORPH_CLOSE, Mat::ones(3, 3, CV_8U), Point(-1, -1), 3);
     Mat newImage, mark;
+    morphologyEx(segm, segm, MORPH_CLOSE, Mat::ones(3, 3, CV_8U), Point(-1, -1), 3);
     distanceTransform(segm, newImage, cv::DIST_L2, 5);
     double maxVal, minVal;
     minMaxLoc(newImage, &minVal, &maxVal);
-    cv::threshold(newImage, newImage, maxVal * 0.6, 255, 0);
+    threshold(newImage, newImage, maxVal * 0.6, 255, 0);
     newImage.convertTo(newImage, CV_8U);
     return connectedComponents(newImage, mark);;
 }
