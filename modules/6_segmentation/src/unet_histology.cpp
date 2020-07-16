@@ -77,13 +77,12 @@ void UNetHistology::segment(const Mat& image, Mat& mask) {
     req.SetBlob("worker_0/validation/IteratorGetNext", inputBlob);
     req.Infer();
 
-    
-
-    int rows = 772, cols = 964;
-    mask = Mat::zeros(rows, cols, CV_8UC1);
+    int row = 772;
+    int col = 964;
+    mask = Mat::zeros(row, col, CV_8UC1);
     int* output = req.GetBlob(outputName)->buffer();
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
             mask.at<uint8_t>(i, j) = output[i * cols + j];
         }
     }
@@ -91,20 +90,14 @@ void UNetHistology::segment(const Mat& image, Mat& mask) {
 }
 
 int UNetHistology::countGlands(const cv::Mat& segm) {
-    Mat tmp = segm;
-    morphologyEx(tmp, tmp, MORPH_CLOSE, Mat::ones(3, 3, CV_8U), Point(-1, -1), 3);
-    cv::dilate(tmp, tmp, Mat::ones(3, 3, CV_8U), Point(-1, -1), 3);
-    cv::distanceTransform(tmp, tmp, DIST_L2, CV_32F);
-    double minVal, maxVal;
-    Point minLoc, maxLoc;
-    minMaxLoc(tmp, &minVal, &maxVal, &minLoc, &maxLoc);
-    threshold(tmp, tmp, maxVal * 0.5, 255, THRESH_BINARY);
-    tmp.convertTo(tmp, CV_8U, 1, 0);
-
-    std::vector<std::vector<Point>> contours;
-    findContours(tmp, contours, RETR_LIST , CHAIN_APPROX_NONE );
-
-    return contours.size();;
+    morphologyEx(segm, segm, MORPH_CLOSE, Mat::ones(3, 3, CV_8U), Point(-1, -1), 3);
+    Mat newImage, mark;
+    distanceTransform(segm, newImage, cv::DIST_L2, 5);
+    double maxDistance, minDistance;
+    minMaxLoc(newImage, &minDistance, &maxDistance);
+    cv::threshold(newImage, newImage, maxDistance * 0.6, 255, 0);
+    newImage.convertTo(newImage, CV_8U);
+    return connectedComponents(newImage, mark);;
 }
 
 void UNetHistology::padMinimum(const Mat& src, int width, int height, Mat& dst) {
