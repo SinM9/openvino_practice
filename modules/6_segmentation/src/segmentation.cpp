@@ -38,11 +38,12 @@ void ADAS::segment(const Mat& image, Mat& mask) {
 
     int* output = req.GetBlob(outputName)->buffer();
 
-    int rows = 1024, cols = 2048;
-    mask = Mat::zeros(rows, cols, CV_8UC1);
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < cols; ++j) {
-            mask.at<uint8_t>(i, j) = output[i * cols + j];
+    int row = 1024;
+    int col = 2048;
+    mask = Mat::zeros(row, col, CV_8UC1);
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+            mask.at<uint8_t>(i, j) = output[i * col + j];
         }
     }
     resize(mask, mask, image.size());

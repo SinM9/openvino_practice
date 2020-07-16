@@ -20,12 +20,13 @@ UNetHistology::UNetHistology() {
     CNNNetwork net = ie.ReadNetwork(join(DATA_FOLDER, "frozen_unet_histology.xml"),
                                     join(DATA_FOLDER, "frozen_unet_histology.bin"));
 
-    outputName = net.getOutputsInfo().begin()->first;
     // Initialize runnable object on CPU device
     ExecutableNetwork execNet = ie.LoadNetwork(net, "CPU");
 
     // Create a single processing thread
     req = execNet.CreateInferRequest();
+
+    outputName = net.getOutputsInfo().begin()->first;
 }
 
 void UNetHistology::bgr2rgb(const Mat& src, Mat& dst) {
@@ -39,9 +40,9 @@ void UNetHistology::normalize(const Mat& src, Mat& dst) {
     dst = Mat::zeros(src.rows, src.cols, CV_32FC3);
     for (int i = 0; i < dst.rows; ++i) {
         for (int j = 0; j < dst.cols; ++j) {
-            dst.at<Vec3f>(i, j)[0] = (src.at<Vec3b>(i, j)[0] - mean[0]) / stdDev[0];
-            dst.at<Vec3f>(i, j)[1] = (src.at<Vec3b>(i, j)[1] - mean[1]) / stdDev[1];
-            dst.at<Vec3f>(i, j)[2] = (src.at<Vec3b>(i, j)[2] - mean[2]) / stdDev[2];
+            for (int k = 0; k< dst.channels(); ++k){
+                dst.at<Vec3f>(i, j)[k] = (src.at<Vec3b>(i, j)[k] - mean[k]) / stdDev[k];
+            }
         }
     }
 }
