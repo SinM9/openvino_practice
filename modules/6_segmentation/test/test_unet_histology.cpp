@@ -79,7 +79,6 @@ TEST(UNetHistology, normalize) {
 
 TEST(UNetHistology, segment) {
     UNetHistology model;
-    std::cout<<"       OOOOOOOOKKKKKKKKKKK      ";
     Mat img = imread(join(DATA_FOLDER, "colon_histology.jpg"));
     Mat mask;
     model.segment(img, mask);

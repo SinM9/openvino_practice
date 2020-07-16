@@ -27,7 +27,6 @@ TEST(segmentation, Dice) {
 TEST(ADAS, segment) {
     
     ADAS model;
-    std::cout<<"       OOOOOOOOKKKKKKKKKKK      ";
 
     Mat img = imread(join(DATA_FOLDER, "car.jpg"));
     Mat mask;
