@@ -95,7 +95,7 @@ int UNetHistology::countGlands(const cv::Mat& segm) {
     distanceTransform(segm, newImage, cv::DIST_L2, 5);
     double maxVal, minVal;
     minMaxLoc(newImage, &minVal, &maxVal);
-    cv::threshold(newImage, newImage, maxVal * 0.5, 255, 0);
+    cv::threshold(newImage, newImage, maxVal * 0.6, 255, 0);
     newImage.convertTo(newImage, CV_8U);
     return connectedComponents(newImage, mark);;
 }
